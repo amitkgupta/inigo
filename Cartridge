@@ -11,3 +11,4 @@ github.com/nu7hatch/gouuid origin/master
 github.com/samuel/go-zookeeper origin/master
 code.google.com/p/gogoprotobuf origin/master
 github.com/cloudfoundry-incubator/executor origin/master
+github.com/coreos/etcd origin/master

@@ -44,10 +44,15 @@ pushd "$ROOTFS_INSTALL_DIR"
   #sudo tar zxf ${ROOTFS_FN} -C ./rootfs
 popd
 
+pushd $GOPATH/src/github.com/coreos/etcd
+  ./build
+  cp bin/etcd $GOPATH/bin
+popd
+
 export GARDEN_ROOTFS="${ROOTFS_INSTALL_DIR}/rootfs"
 
 go install github.com/onsi/ginkgo/ginkgo
 
 pushd $GOPATH/src/github.com/cloudfoundry-incubator/inigo
-  ginkgo -r
+  ginkgo -r -i -skipMeasurements -randomizeAllSpecs "$@"
 popd
