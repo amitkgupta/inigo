@@ -94,7 +94,7 @@ func (r *GardenRunner) Start(argv ...string) error {
 
 	go r.waitForStart(started, stop)
 
-	timeout := 10 * time.Second
+	timeout := 1 * time.Minute
 
 	r.gardenCmd = garden
 
