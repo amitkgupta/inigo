@@ -114,9 +114,9 @@ func (r *GardenRunner) Stop() error {
 		return nil
 	}
 
-	fmt.Printf("KILLING %d %v\n", r.gardenCmd.ProcessState.Pid, r.gardenCmd.ProcessState.Pid)
+	fmt.Printf("KILLING %d %v\n", r.gardenCmd.ProcessState.Pid(), r.gardenCmd.ProcessState.Pid())
 
-	stopCmd := exec.Command("sudo", "kill", fmt.Sprintf("%d", r.gardenCmd.ProcessState.Pid))
+	stopCmd := exec.Command("sudo", "kill", fmt.Sprintf("%d", r.gardenCmd.ProcessState.Pid()))
 	stopCmd.Stderr = os.Stderr
 	stopCmd.Stdout = os.Stdout
 
