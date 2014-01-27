@@ -57,6 +57,8 @@ func TestRun_once(t *testing.T) {
 			panic(err.Error())
 		}
 
+		gardenRunner.SnapshotsPath = ""
+
 		err = gardenRunner.Start()
 		if err != nil {
 			panic(err.Error())
