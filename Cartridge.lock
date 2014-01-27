@@ -4,3 +4,9 @@ github.com/onsi/ginkgo	c6d536e4cd9a6081767209fed9807811949a4033
 github.com/onsi/gomega	d7685fbd45fb7bef327b43ca2781368c68bf72b7
 github.com/cloudfoundry/storeadapter	bf8788eab3f955b8ad3e127b319c1634fb4988e4
 github.com/vito/cmdtest	4b86f8c2259c55e86e4b971cd7dc5dfb03e41b80
+github.com/vito/gordon	be6421b41938ee3af489399dbe736c508b276e36
+github.com/cloudfoundry/gunk	24e811fc31d116330aaadfa9ff8e6693580436e1
+github.com/coreos/go-etcd	895202b626e0ff14fb87457c12112ed109b71b53
+github.com/nu7hatch/gouuid	179d4d0c4d8d407a32af483c2354df1d2c91e6c3
+github.com/samuel/go-zookeeper	897888e14f7bd6c1c9a70e2973d0f5fbdb28bde0
+code.google.com/p/gogoprotobuf	5ad34ffef55c3655a6ca3f46adf798484c3e1e2e
