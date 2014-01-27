@@ -10,3 +10,4 @@ github.com/coreos/go-etcd	895202b626e0ff14fb87457c12112ed109b71b53
 github.com/nu7hatch/gouuid	179d4d0c4d8d407a32af483c2354df1d2c91e6c3
 github.com/samuel/go-zookeeper	897888e14f7bd6c1c9a70e2973d0f5fbdb28bde0
 code.google.com/p/gogoprotobuf	5ad34ffef55c3655a6ca3f46adf798484c3e1e2e
+github.com/cloudfoundry-incubator/executor	e53f3aa4c8fa73b4254025b03943e2880736a256
