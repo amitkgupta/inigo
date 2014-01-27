@@ -57,6 +57,11 @@ func TestRun_once(t *testing.T) {
 			panic(err.Error())
 		}
 
+		err = gardenRunner.Start()
+		if err != nil {
+			panic(err.Error())
+		}
+
 		wardenClient = gardenRunner.NewClient()
 
 		wardenNetwork = "tcp"
