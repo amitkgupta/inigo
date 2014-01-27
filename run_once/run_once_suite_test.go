@@ -96,7 +96,10 @@ func TestRun_once(t *testing.T) {
 
 	RunSpecs(t, "RunOnce Suite")
 
+	println("STOPPING ETCD!!!!")
 	etcdRunner.Stop()
+
+	println("STOPPING!!!!")
 	gardenRunner.Stop()
 }
 
