@@ -97,6 +97,7 @@ func TestRun_once(t *testing.T) {
 	RunSpecs(t, "RunOnce Suite")
 
 	etcdRunner.Stop()
+	gardenRunner.Stop()
 }
 
 var _ = BeforeEach(func() {
