@@ -3,8 +3,8 @@
 set -e -x
 
 if [ -z "$WORKSPACE" ]; then
-  echo This script assumes it's running in Jenkins.
-  echo You probably want to just run 'ginkgo'.
+  echo "This script assumes it's running in Jenkins."
+  echo "You probably want to just run 'ginkgo'."
   exit 1
 fi
 
@@ -49,10 +49,3 @@ export GARDEN_ROOTFS="${ROOTFS_INSTALL_DIR}/rootfs"
 pushd $GOPATH/src/github.com/cloudfoundry-incubator/inigo
   ginkgo -r
 popd
-
-#sudo $(which garden) \
-#  -backend=linux \
-#  -depot=$GARDEN_DEPOT \
-#  -root=$GARDEN_ROOT \
-#  -rootfs=$GARDEN_ROOTFS \
-#  -debug
