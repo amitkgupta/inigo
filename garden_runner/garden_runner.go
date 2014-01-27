@@ -108,9 +108,13 @@ func (r *GardenRunner) Start(argv ...string) error {
 }
 
 func (r *GardenRunner) Stop() error {
+	fmt.Println("KILL?", r.gardenCmd)
+
 	if r.gardenCmd == nil {
 		return nil
 	}
+
+	fmt.Println("KILLING", r.gardenCmd.ProcessState.Pid)
 
 	stopCmd := exec.Command("sudo", "kill", fmt.Sprintf("%d", r.gardenCmd.ProcessState.Pid))
 	stopCmd.Stderr = os.Stderr
