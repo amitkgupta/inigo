@@ -46,6 +46,8 @@ popd
 
 export GARDEN_ROOTFS="${ROOTFS_INSTALL_DIR}/rootfs"
 
+go install github.com/onsi/ginkgo/ginkgo
+
 pushd $GOPATH/src/github.com/cloudfoundry-incubator/inigo
   ginkgo -r
 popd
