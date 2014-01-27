@@ -112,7 +112,8 @@ func (r *GardenRunner) Stop() error {
 		return nil
 	}
 
-	err := r.gardenCmd.Process.Signal(os.Interrupt)
+	stopCmd := exec.Command("sudo", fmt.Sprintf("kill %d", r.gardenCmd.ProcessState.Pid))
+	err := stopCmd.Run()
 	if err != nil {
 		return err
 	}
