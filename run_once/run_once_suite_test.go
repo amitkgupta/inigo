@@ -98,28 +98,14 @@ func TestRun_once(t *testing.T) {
 
 	RunSpecs(t, "RunOnce Suite")
 
-	println("STOPPING ETCD!!!!")
 	etcdRunner.Stop()
-
-	println("STOPPING!!!!")
 	gardenRunner.Stop()
 }
 
 var _ = BeforeEach(func() {
 	etcdRunner.Reset()
-	nukeAllWardenContainers()
+	gardenRunner.DestroyContainers()
 })
-
-func nukeAllWardenContainers() {
-	listResponse, err := wardenClient.List()
-	Ω(err).ShouldNot(HaveOccurred())
-
-	handles := listResponse.GetHandles()
-	for _, handle := range handles {
-		_, err := wardenClient.Destroy(handle)
-		Ω(err).ShouldNot(HaveOccurred())
-	}
-}
 
 func registerSignalHandler() {
 	go func() {
@@ -129,7 +115,8 @@ func registerSignalHandler() {
 		select {
 		case <-c:
 			etcdRunner.Stop()
-			os.Exit(0)
+			gardenRunner.Stop()
+			os.Exit(1)
 		}
 	}()
 }

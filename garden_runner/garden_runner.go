@@ -108,13 +108,9 @@ func (r *GardenRunner) Start(argv ...string) error {
 }
 
 func (r *GardenRunner) Stop() error {
-	fmt.Println("KILL?", r.gardenCmd)
-
 	if r.gardenCmd == nil {
 		return nil
 	}
-
-	fmt.Printf("KILLING %d %v\n", r.gardenCmd.Process.Pid, r.gardenCmd.Process.Pid)
 
 	stopCmd := exec.Command("sudo", "kill", fmt.Sprintf("%d", r.gardenCmd.Process.Pid))
 	stopCmd.Stderr = os.Stderr
@@ -156,6 +152,7 @@ func (r *GardenRunner) DestroyContainers() error {
 		}
 
 		err := r.cmd(
+			"sudo",
 			filepath.Join(r.RootPath, "linux", "destroy.sh"),
 			dir,
 		).Run()
@@ -165,7 +162,14 @@ func (r *GardenRunner) DestroyContainers() error {
 		}
 	}
 
-	return r.cmd("rm", "-rf", r.SnapshotsPath).Run()
+	if r.SnapshotsPath != "" {
+		err := r.cmd("rm", "-rf", r.SnapshotsPath).Run()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *GardenRunner) TearDown() error {
