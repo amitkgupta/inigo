@@ -2,6 +2,7 @@ package inigo_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,11 +18,13 @@ import (
 	"github.com/cloudfoundry-incubator/auctioneer/integration/auctioneer_runner"
 	"github.com/cloudfoundry-incubator/converger/converger_runner"
 	"github.com/cloudfoundry-incubator/executor/integration/executor_runner"
+	"github.com/cloudfoundry-incubator/file-server/integration/fileserver_runner"
 	WardenClient "github.com/cloudfoundry-incubator/garden/client"
 	WardenConnection "github.com/cloudfoundry-incubator/garden/client/connection"
 	"github.com/cloudfoundry-incubator/garden/warden"
 	"github.com/cloudfoundry-incubator/rep/reprunner"
 	"github.com/cloudfoundry-incubator/route-emitter/integration/route_emitter_runner"
+	"github.com/cloudfoundry-incubator/stager/integration/stager_runner"
 	WardenRunner "github.com/cloudfoundry-incubator/warden-linux/integration/runner"
 	gorouterconfig "github.com/cloudfoundry/gorouter/config"
 	"github.com/cloudfoundry/gunk/natsrunner"
@@ -32,11 +35,9 @@ import (
 	"github.com/onsi/gomega/gexec"
 
 	"github.com/cloudfoundry-incubator/inigo/fake_cc"
-	"github.com/cloudfoundry-incubator/inigo/fileserver_runner"
 	"github.com/cloudfoundry-incubator/inigo/inigo_server"
 	"github.com/cloudfoundry-incubator/inigo/loggregator_runner"
 	"github.com/cloudfoundry-incubator/inigo/router_runner"
-	"github.com/cloudfoundry-incubator/inigo/stager_runner"
 )
 
 var SHORT_TIMEOUT = 5.0
@@ -76,7 +77,7 @@ func (d sharedContextType) Encode() []byte {
 }
 
 type Runner interface {
-	Stop()
+	KillWithFire()
 }
 
 type suiteContextType struct {
@@ -112,7 +113,7 @@ type suiteContextType struct {
 	FakeCC        *fake_cc.FakeCC
 	FakeCCAddress string
 
-	FileServerRunner *fileserver_runner.FileServerRunner
+	FileServerRunner *fileserver_runner.Runner
 	FileServerPort   int
 
 	RouteEmitterRunner *route_emitter_runner.Runner
@@ -141,11 +142,35 @@ func (context suiteContextType) Runners() []Runner {
 }
 
 func (context suiteContextType) StopRunners() {
+	errs := make([]string, 0)
+
 	for _, stoppable := range context.Runners() {
 		if !reflect.ValueOf(stoppable).IsNil() {
-			stoppable.Stop()
+			err := cleanStop(stoppable)
+			if err != nil {
+				errs = append(errs, err.Error())
+			}
 		}
 	}
+
+	var err error
+	if len(errs) > 0 {
+		err = errors.New(strings.Join(errs, "\n"))
+	}
+
+	Ω(err).ShouldNot(HaveOccurred())
+}
+
+func cleanStop(stoppable Runner) (err error) {
+	defer func() {
+		e := recover()
+		switch e := e.(type) {
+		case error:
+			err = e
+		}
+	}()
+	stoppable.KillWithFire()
+	return nil
 }
 
 var suiteContext suiteContextType
@@ -298,7 +323,7 @@ func TestInigo(t *testing.T) {
 	nodeOne := &nodeOneType{}
 
 	SynchronizedBeforeSuite(func() []byte {
-		nodeOne.StartWarden()
+		nodeOne.Start()
 		nodeOne.CompileTestedExecutables()
 
 		return nodeOne.context.Encode()
@@ -317,12 +342,11 @@ func TestInigo(t *testing.T) {
 	})
 
 	AfterEach(func() {
+		defer inigo_server.Stop(suiteContext.WardenClient)
 		suiteContext.StopRunners()
-
-		inigo_server.Stop(suiteContext.WardenClient)
 	})
 
-	SynchronizedAfterSuite(afterSuite, nodeOne.StopWarden)
+	SynchronizedAfterSuite(afterSuite, nodeOne.KillWithFire)
 
 	RunSpecs(t, "Inigo Integration Suite")
 }
@@ -349,7 +373,7 @@ type nodeOneType struct {
 	context      sharedContextType
 }
 
-func (node *nodeOneType) StartWarden() {
+func (node *nodeOneType) Start() {
 	wardenBinPath := os.Getenv("WARDEN_BINPATH")
 	wardenRootfs := os.Getenv("WARDEN_ROOTFS")
 
@@ -374,8 +398,7 @@ func (node *nodeOneType) StartWarden() {
 
 	node.wardenRunner.SnapshotsPath = ""
 
-	err = node.wardenRunner.Start()
-	Ω(err).ShouldNot(HaveOccurred())
+	node.wardenRunner.Start()
 
 	node.context.WardenAddr = node.wardenRunner.Addr
 	node.context.WardenNetwork = node.wardenRunner.Network
@@ -448,9 +471,8 @@ func (node *nodeOneType) compileAndZipUpCircus() string {
 	return filepath.Join(circusDir, "circus.zip")
 }
 
-func (node *nodeOneType) StopWarden() {
+func (node *nodeOneType) KillWithFire() {
 	if node.wardenRunner != nil {
-		node.wardenRunner.TearDown()
-		node.wardenRunner.Stop()
+		node.wardenRunner.KillWithFire()
 	}
 }
