@@ -43,6 +43,10 @@ func New(routerPath string, config *config.Config) *Runner {
 }
 
 func (runner *Runner) Start() {
+	if runner.session != nil {
+		panic("starting an already started router runner!!!")
+	}
+
 	sess, err := gexec.Start(
 		exec.Command(runner.routerPath, "-c", runner.configFile.Name()),
 		ginkgo.GinkgoWriter,
@@ -55,8 +59,13 @@ func (runner *Runner) Start() {
 }
 
 func (runner *Runner) Stop() {
+	runner.KillWithFire()
+}
+
+func (runner *Runner) KillWithFire() {
 	if runner.session != nil {
 		runner.session.Kill().Wait(5 * time.Second)
+		runner.session = nil
 	}
 }
 

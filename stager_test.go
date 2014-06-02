@@ -174,7 +174,7 @@ EOF
 				suiteContext.StagerRunner.Start("--circuses", `{"lucid64":"lifecycle.zip"}`)
 			})
 
-			It("runs the compiler on the executor with the correct environment variables, bits and log tag, and responds with the detected buildpack", func() {
+			FIt("runs the compiler on the executor with the correct environment variables, bits and log tag, and responds with the detected buildpack", func() {
 				//listen for NATS response
 				payloads := make(chan []byte)
 

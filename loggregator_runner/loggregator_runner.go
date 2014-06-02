@@ -51,6 +51,10 @@ func New(loggregatorPath string, config Config) *LoggregatorRunner {
 }
 
 func (runner *LoggregatorRunner) Start() {
+	if runner.session != nil {
+		panic("starting an already started loggregator runner!!!")
+	}
+
 	sess, err := gexec.Start(
 		exec.Command(runner.loggregatorPath, "--config", runner.configFile.Name()),
 		ginkgo.GinkgoWriter,
@@ -63,7 +67,12 @@ func (runner *LoggregatorRunner) Start() {
 }
 
 func (runner *LoggregatorRunner) Stop() {
+	runner.KillWithFire()
+}
+
+func (runner *LoggregatorRunner) KillWithFire() {
 	if runner.session != nil {
 		runner.session.Kill().Wait(5 * time.Second)
+		runner.session = nil
 	}
 }
