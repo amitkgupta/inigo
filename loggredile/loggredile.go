@@ -13,7 +13,7 @@ import (
 	"github.com/onsi/gomega/gbytes"
 )
 
-func StreamMessages(port int, path string) (<-chan *logmessage.LogMessage, chan<- bool) {
+func StreamMessages(addr string, path string) (<-chan *logmessage.LogMessage, chan<- bool) {
 	receivedMessages := make(chan *logmessage.LogMessage)
 	stop := make(chan bool, 1)
 
@@ -22,7 +22,7 @@ func StreamMessages(port int, path string) (<-chan *logmessage.LogMessage, chan<
 	for {
 		var err error
 		ws, _, err = websocket.DefaultDialer.Dial(
-			fmt.Sprintf("ws://127.0.0.1:%d%s", port, path),
+			fmt.Sprintf("ws://%s%s", addr, path),
 			http.Header{},
 		)
 		if err != nil {
@@ -77,8 +77,8 @@ func StreamMessages(port int, path string) (<-chan *logmessage.LogMessage, chan<
 	return receivedMessages, stop
 }
 
-func StreamIntoGBuffer(port int, path string, sourceName string) (*gbytes.Buffer, chan<- bool) {
-	messages, stop := StreamMessages(port, path)
+func StreamIntoGBuffer(addr string, path string, sourceName string) (*gbytes.Buffer, chan<- bool) {
+	messages, stop := StreamMessages(addr, path)
 	logOutput := gbytes.NewBuffer()
 
 	go func() {

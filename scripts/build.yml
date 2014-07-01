@@ -6,8 +6,8 @@ env:
   - PATH: $GOROOT/bin:$PATH
   - GOPATH: /tmp/build/src/inigo
   - GINKGO_PARALLEL: true
-  - SHORT_TIMEOUT: 2.0
-  - LONG_TIMEOUT: 10.0
+  - SHORT_TIMEOUT: 2s
+  - LONG_TIMEOUT: 10s
 
 script: |
   set -e

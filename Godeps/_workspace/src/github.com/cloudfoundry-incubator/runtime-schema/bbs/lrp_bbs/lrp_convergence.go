@@ -129,6 +129,8 @@ func (bbs *LRPBBS) needsReconciliation(desiredLRP models.DesiredLRP, actualLRPsF
 }
 
 func (bbs *LRPBBS) pruneActualsWithMissingExecutors() (map[string][]models.ActualLRP, error) {
+	bbs.logger.Infod(map[string]interface{}{}, "lrp-converger.pruneActualsWithMissingExecutors")
+
 	executorState, err := bbs.store.ListRecursively(shared.ExecutorSchemaRoot)
 	if err == storeadapter.ErrorKeyNotFound {
 		executorState = storeadapter.StoreNode{}
@@ -146,6 +148,10 @@ func (bbs *LRPBBS) pruneActualsWithMissingExecutors() (map[string][]models.Actua
 		}, "lrp-converger.get-actuals.failed")
 		return nil, err
 	}
+
+	bbs.logger.Infod(map[string]interface{}{
+		"actuals ": len(actuals),
+	}, "lrp-converger.get-actuals.count")
 
 	keysToDelete := []string{}
 	actualsByProcessGuid := map[string][]models.ActualLRP{}
