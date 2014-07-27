@@ -86,9 +86,10 @@ type suiteContextType struct {
 
 	ExternalAddress string
 
-	RepStack   string
-	ExecutorID string
-	EtcdRunner *etcdstorerunner.ETCDClusterRunner
+	RepStack    string
+	RepAZNumber int
+	ExecutorID  string
+	EtcdRunner  *etcdstorerunner.ETCDClusterRunner
 
 	WardenProcess ifrit.Process
 	WardenClient  warden.Client
@@ -113,6 +114,8 @@ type suiteContextType struct {
 
 	StagerRunner     *stager_runner.StagerRunner
 	AppManagerRunner *app_manager_runner.AppManagerRunner
+
+	NumberOfAZs int
 
 	NsyncListenerRunner ifrit.Runner
 
@@ -168,6 +171,8 @@ func beforeSuite(encodedSharedContext []byte) {
 		SharedContext:           sharedContext,
 		ExternalAddress:         os.Getenv("EXTERNAL_ADDRESS"),
 		RepStack:                "lucid64",
+		RepAZNumber:             0,
+		NumberOfAZs:             1,
 		ExecutorID:              "the-executor-id-" + string(config.GinkgoConfig.ParallelNode),
 		NatsPort:                4222 + config.GinkgoConfig.ParallelNode,
 		ExecutorPort:            1700 + config.GinkgoConfig.ParallelNode,
@@ -246,6 +251,7 @@ func beforeSuite(encodedSharedContext []byte) {
 
 	context.RepRunner = reprunner.New(
 		context.SharedContext.RepPath,
+		context.RepAZNumber,
 		context.ExecutorID,
 		context.RepStack,
 		context.ExternalAddress,
@@ -274,6 +280,7 @@ func beforeSuite(encodedSharedContext []byte) {
 		context.SharedContext.AppManagerPath,
 		context.EtcdRunner.NodeURLS(),
 		map[string]string{context.RepStack: "some-lifecycle-bundle.tgz"},
+		context.NumberOfAZs,
 		fmt.Sprintf("127.0.0.1:%d", context.RepPort),
 	)
 
