@@ -5,7 +5,6 @@ package gosteno
 import (
 	syslog "github.com/cloudfoundry/gosteno/syslog"
 	"sync"
-	"errors"
 )
 
 const (
@@ -23,7 +22,7 @@ type Syslog struct {
 func NewSyslogSink(namespace string) *Syslog {
 	writer, err := syslog.New(syslog.LOG_DEBUG, namespace)
 	if err != nil {
-		panic(errors.New("Could not setup logging to syslog: " + err.Error()))
+		panic(err)
 	}
 
 	syslog := new(Syslog)
