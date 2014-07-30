@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"syscall"
 	"testing"
@@ -173,7 +174,7 @@ func beforeSuite(encodedSharedContext []byte) {
 		RepStack:                "lucid64",
 		RepAZNumber:             0,
 		NumberOfAZs:             1,
-		ExecutorID:              "the-executor-id-" + string(config.GinkgoConfig.ParallelNode),
+		ExecutorID:              "the-executor-id-" + strconv.Itoa(config.GinkgoConfig.ParallelNode),
 		NatsPort:                4222 + config.GinkgoConfig.ParallelNode,
 		ExecutorPort:            1700 + config.GinkgoConfig.ParallelNode,
 		RepPort:                 20515 + config.GinkgoConfig.ParallelNode,
@@ -274,14 +275,14 @@ func beforeSuite(encodedSharedContext []byte) {
 		context.SharedContext.NsyncListenerPath,
 		"-etcdCluster", strings.Join(context.EtcdRunner.NodeURLS(), ","),
 		"-natsAddresses", fmt.Sprintf("127.0.0.1:%d", context.NatsPort),
+		"-circuses", `{"`+context.RepStack+`":"some-lifecycle-bundle.tgz"}`,
+		"-repAddrRelativeToExecutor", fmt.Sprintf("127.0.0.1:%d", context.RepPort),
 	)
 
 	context.AppManagerRunner = app_manager_runner.New(
 		context.SharedContext.AppManagerPath,
 		context.EtcdRunner.NodeURLS(),
-		map[string]string{context.RepStack: "some-lifecycle-bundle.tgz"},
 		context.NumberOfAZs,
-		fmt.Sprintf("127.0.0.1:%d", context.RepPort),
 	)
 
 	context.FileServerRunner = fileserver_runner.New(
